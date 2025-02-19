@@ -1,0 +1,22 @@
+<idea-plugin>
+    <id>com.gonudayo.sweasamplejudge</id>
+    <name>SWEA Sample Judge</name>
+    <vendor email="kgw010119@gmail.com" url="https://github.com/gonudayo">gonudayo</vendor>
+
+    <description>
+        SWEA Sample Judge for IntelliJ IDEA and PyCharm.
+    </description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <actions>
+        <action id="com.gonudayo.sweasamplejudge.JudgeAction"
+                class="com.gonudayo.sweasamplejudge.actions.JudgeAction"
+                text="Run Judge"
+                description="Run test sample cases">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+            <keyboard-shortcut first-keystroke="shift F1" keymap="$default"/>
+        </action>
+    </actions>
+</idea-plugin>
+
