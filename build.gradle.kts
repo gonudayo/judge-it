@@ -13,12 +13,23 @@ repositories {
 
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
+//intellij {
+//    version.set("2024.1.7")
+//    type.set("IC") // Target IDE Platform
+//
+//    plugins.set(listOf(/* Plugin Dependencies */))
+//}
 intellij {
     version.set("2024.1.7")
-    type.set("IC") // Target IDE Platform
-
-    plugins.set(listOf(/* Plugin Dependencies */))
+    type.set("PC") // PyCharm Community: "PC", PyCharm Professional: "PY"
+    plugins.set(listOf("PythonCore")) // Python 플러그인 추가
 }
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17)) // JDK 17 사용
+    }
+}
+
 
 tasks {
     // Set the JVM compatibility versions
