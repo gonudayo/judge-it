@@ -9,6 +9,7 @@ import com.intellij.execution.process.CapturingProcessHandler;
 import com.intellij.execution.process.ProcessOutput;
 import com.intellij.execution.ExecutionException;
 import com.intellij.openapi.ui.Messages;
+import com.gonudayo.sweasamplejudge.settings.PythonRunnerSettings;
 import org.jetbrains.annotations.NotNull;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -16,6 +17,8 @@ import java.nio.file.Paths;
 import java.io.*;
 import javax.swing.*;
 import java.awt.*;
+
+
 
 public class PythonRunnerService {
     public static void runPythonFile(Project project, VirtualFile file) {
@@ -30,16 +33,17 @@ public class PythonRunnerService {
         // 임시 Python 파일 경로 (같은 폴더에 "__temp__.py" 이름으로 저장)
         String tempFilePath = file.getParent().getPath() + "/__temp__.py";
         // 출력 결과 저장 경로
-        String outputFilePath = file.getParent().getPath() + "/your_output.txt";
-        // 지정된 입력 파일 경로 (변경 필요)
-        String inputFilePath = "C:/Users/SSAFY/Downloads/SWEA-samples/input.txt";
+        String userOutputFilePath = file.getParent().getPath() + "/your_output.txt";
+        // 지정된 입력 파일 경로
+        String sampleInputFilePath = getInputFilePath();
+
 
         try {
             // 1. 원본 Python 코드 읽기
             String originalCode = new String(Files.readAllBytes(Paths.get(originalFilePath)), StandardCharsets.UTF_8);
 
             // 2️. `sys.stdin = open("C:/Users/SSAFY/Downloads/SWEA-samples/input.txt", "r")` 추가
-            String modifiedCode = "import sys\nsys.stdin = open(\"" + inputFilePath + "\", \"r\")\n\n" + originalCode;
+            String modifiedCode = "import sys\nsys.stdin = open(\"" + sampleInputFilePath + "\", \"r\")\n\n" + originalCode;
 
             // 3️. 수정된 코드를 임시 파일에 저장
             Files.write(Paths.get(tempFilePath), modifiedCode.getBytes(StandardCharsets.UTF_8));
@@ -53,7 +57,7 @@ public class PythonRunnerService {
             ProcessOutput output = processHandler.runProcess();
 
             // 6️. Python 실행 결과를 파일에 저장
-            Files.write(Paths.get(outputFilePath), output.getStdout().getBytes(StandardCharsets.UTF_8));
+            Files.write(Paths.get(userOutputFilePath), output.getStdout().getBytes(StandardCharsets.UTF_8));
 
             // 실행 중 에러가 발생하면 stderr 표시
             if (!output.getStderr().isEmpty()) {
@@ -74,8 +78,7 @@ public class PythonRunnerService {
     // 파일 비교 및 결과 출력
     private static void compareOutputs(Project project, String parentPath) throws IOException {
         BufferedReader userOutput = new BufferedReader(new FileReader(parentPath + "/your_output.txt"));
-        BufferedReader sampleOutput = new BufferedReader(new FileReader("C:/Users/SSAFY/Downloads/SWEA-samples/output.txt"));
-        // (변경 필요)
+        BufferedReader sampleOutput = new BufferedReader(new FileReader(getOutputFilePath()));
 
         StringBuilder resultMessage = new StringBuilder();
         String userLine, sampleLine;
@@ -150,5 +153,16 @@ public class PythonRunnerService {
     private static String getPythonExecutable(Project project) {
         Sdk sdk = ProjectRootManager.getInstance(project).getProjectSdk();
         return (sdk != null) ? sdk.getHomePath() : "python";
+    }
+
+    // 인풋 파일 경로
+    private static String getInputFilePath() {
+        return PythonRunnerSettings.getInstance().getState().inputFilePath;
+    }
+
+
+    // 아웃풋 파일 경로
+    private static String getOutputFilePath() {
+        return PythonRunnerSettings.getInstance().getState().outputFilePath;
     }
 }

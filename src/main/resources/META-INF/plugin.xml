@@ -9,14 +9,23 @@
 
     <depends>com.intellij.modules.platform</depends>
 
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationConfigurable
+                id="com.gonudayo.sweasamplejudge.settings.PythonRunnerConfigurable"
+                displayName="Python Runner Settings"
+                groupId="tools"
+                instance="com.gonudayo.sweasamplejudge.settings.PythonRunnerConfigurable"/>
+    </extensions>
+
+
+
     <actions>
         <action id="com.gonudayo.sweasamplejudge.JudgeAction"
                 class="com.gonudayo.sweasamplejudge.actions.JudgeAction"
                 text="Run Judge"
                 description="Run test sample cases">
-            <add-to-group group-id="ToolsMenu" anchor="last"/>
-            <keyboard-shortcut first-keystroke="alt R" keymap="$default"/>
+            <add-to-group group-id="ToolsMenu" anchor="last" />
+            <keyboard-shortcut first-keystroke="alt R" keymap="$default" />
         </action>
     </actions>
 </idea-plugin>
-
