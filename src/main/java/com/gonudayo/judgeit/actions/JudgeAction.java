@@ -1,6 +1,6 @@
-package com.gonudayo.sweasamplejudge.actions;
+package com.gonudayo.judgeit.actions;
 
-import com.gonudayo.sweasamplejudge.services.PythonRunnerService;
+import com.gonudayo.judgeit.services.PythonRunnerService;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.editor.Editor;
@@ -21,8 +21,7 @@ public class JudgeAction extends AnAction {
         VirtualFile file = FileDocumentManager.getInstance().getFile(editor.getDocument());
         if (file == null) return;
 
-        // Python 실행 요청을 서비스 클래스로 분리
+        // Python 실행 요청
         PythonRunnerService.runPythonFile(project, file);
-
     }
 }

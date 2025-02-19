@@ -1,4 +1,4 @@
-package com.gonudayo.sweasamplejudge.services;
+package com.gonudayo.judgeit.services;
 
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.ProjectRootManager;
@@ -8,9 +8,8 @@ import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.CapturingProcessHandler;
 import com.intellij.execution.process.ProcessOutput;
 import com.intellij.execution.ExecutionException;
-import com.intellij.openapi.ui.Messages;
-import com.gonudayo.sweasamplejudge.settings.PythonRunnerSettings;
-import org.jetbrains.annotations.NotNull;
+import com.gonudayo.judgeit.settings.PythonRunnerSettings;
+
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -37,26 +36,25 @@ public class PythonRunnerService {
         // 지정된 입력 파일 경로
         String sampleInputFilePath = getInputFilePath();
 
-
         try {
             // 1. 원본 Python 코드 읽기
             String originalCode = new String(Files.readAllBytes(Paths.get(originalFilePath)), StandardCharsets.UTF_8);
 
-            // 2️. `sys.stdin = open("C:/Users/SSAFY/Downloads/SWEA-samples/input.txt", "r")` 추가
+            // 2. `sys.stdin = open("C:/Users/SSAFY/Downloads/SWEA-samples/input.txt", "r")` 추가
             String modifiedCode = "import sys\nsys.stdin = open(\"" + sampleInputFilePath + "\", \"r\")\n\n" + originalCode;
 
-            // 3️. 수정된 코드를 임시 파일에 저장
+            // 3. 수정된 코드를 임시 파일에 저장
             Files.write(Paths.get(tempFilePath), modifiedCode.getBytes(StandardCharsets.UTF_8));
 
-            // 4️. Python 실행 명령어 설정
+            // 4. Python 실행 명령어 설정
             GeneralCommandLine commandLine = new GeneralCommandLine(pythonPath, tempFilePath);
             commandLine.setCharset(StandardCharsets.UTF_8);
 
-            // 5️. Python 실행
+            // 5. Python 실행
             CapturingProcessHandler processHandler = new CapturingProcessHandler(commandLine);
             ProcessOutput output = processHandler.runProcess();
 
-            // 6️. Python 실행 결과를 파일에 저장
+            // 6. Python 실행 결과를 파일에 저장
             Files.write(Paths.get(userOutputFilePath), output.getStdout().getBytes(StandardCharsets.UTF_8));
 
             // 실행 중 에러가 발생하면 stderr 표시
@@ -65,13 +63,15 @@ public class PythonRunnerService {
                 return;  // 비교 진행 X
             }
 
-            // 7️. 비교 및 결과 출력
+            // 7. 비교 및 결과 출력
             compareOutputs(project, file.getParent().getPath());
 
         } catch (ExecutionException | IOException e) {
             showResultDialog("Execution Error", "Error: " + e.getMessage());
             e.printStackTrace();
         } finally {
+            // 8. 실행이 끝난 후 임시 파일 삭제
+            new File(tempFilePath).delete();
         }
     }
 
@@ -114,6 +114,7 @@ public class PythonRunnerService {
         }
     }
 
+    // 결과창
     private static void showResultDialog(String title, String showMessage) {
         JTextArea textArea = new JTextArea(showMessage, 50, 100); // 높이 50줄, 너비 100글자
         textArea.setEditable(false); // 편집 불가 설정

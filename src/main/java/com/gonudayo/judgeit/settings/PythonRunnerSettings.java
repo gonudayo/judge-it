@@ -1,4 +1,4 @@
-package com.gonudayo.sweasamplejudge.settings;
+package com.gonudayo.judgeit.settings;
 
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @State(
-        name = "com.gonudayo.sweasamplejudge.settings.PythonRunnerSettings",
+        name = "com.gonudayo.judgeit.settings.PythonRunnerSettings",
         storages = @Storage("PythonRunnerSettings.xml")
 )
 public class PythonRunnerSettings implements PersistentStateComponent<PythonRunnerSettings.State> {

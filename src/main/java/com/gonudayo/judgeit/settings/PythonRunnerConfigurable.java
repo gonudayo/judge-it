@@ -1,4 +1,4 @@
-package com.gonudayo.sweasamplejudge.settings;
+package com.gonudayo.judgeit.settings;
 
 import com.intellij.openapi.options.Configurable;
 import org.jetbrains.annotations.Nls;

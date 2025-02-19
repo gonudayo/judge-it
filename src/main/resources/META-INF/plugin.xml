@@ -1,31 +1,29 @@
 <idea-plugin>
-    <id>com.gonudayo.sweasamplejudge</id>
-    <name>SWEA Sample Judge</name>
+    <id>com.gonudayo.judgeit</id>
+    <name>Judge It</name>
     <vendor email="kgw010119@gmail.com" url="https://github.com/gonudayo">gonudayo</vendor>
 
     <description>
-        SWEA Sample Judge for IntelliJ IDEA and PyCharm.
+        Simplify your testing workflow with automated sample execution and output comparison.
     </description>
 
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <applicationConfigurable
-                id="com.gonudayo.sweasamplejudge.settings.PythonRunnerConfigurable"
-                displayName="Python Runner Settings"
+                id="com.gonudayo.judgeit.settings.PythonRunnerConfigurable"
+                displayName="Judge It"
                 groupId="tools"
-                instance="com.gonudayo.sweasamplejudge.settings.PythonRunnerConfigurable"/>
+                instance="com.gonudayo.judgeit.settings.PythonRunnerConfigurable"/>
     </extensions>
 
-
-
     <actions>
-        <action id="com.gonudayo.sweasamplejudge.JudgeAction"
-                class="com.gonudayo.sweasamplejudge.actions.JudgeAction"
-                text="Run Judge"
+        <action id="com.gonudayo.judgeit.JudgeAction"
+                class="com.gonudayo.judgeit.actions.JudgeAction"
+                text="Judge It"
                 description="Run test sample cases">
             <add-to-group group-id="ToolsMenu" anchor="last" />
-            <keyboard-shortcut first-keystroke="alt R" keymap="$default" />
+            <keyboard-shortcut first-keystroke="alt S" keymap="$default" />
         </action>
     </actions>
 </idea-plugin>
