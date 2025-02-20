@@ -131,6 +131,9 @@ public class PythonRunnerService {
         JButton closeButton = new JButton("Close");
         closeButton.addActionListener(e -> dialog.dispose()); // 버튼 클릭 시 창 닫기
 
+        // 엔터 키로 닫기 활성화
+        dialog.getRootPane().setDefaultButton(closeButton);
+
         // 버튼을 포함할 패널 생성
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(closeButton);
@@ -156,14 +159,19 @@ public class PythonRunnerService {
         return (sdk != null) ? sdk.getHomePath() : "python";
     }
 
-    // 인풋 파일 경로
+    // 샘플 폴더 경로 가져오기
+    private static String getSampleFolderPath() {
+        return PythonRunnerSettings.getInstance().getState().folderPath;
+    }
+
+    // 인풋 파일 경로 (폴더 내부의 input.txt로 설정)
     private static String getInputFilePath() {
-        return PythonRunnerSettings.getInstance().getState().inputFilePath;
+        return getSampleFolderPath() + "/input.txt";
     }
 
-
-    // 아웃풋 파일 경로
+    // 아웃풋 파일 경로 (폴더 내부의 output.txt로 설정)
     private static String getOutputFilePath() {
-        return PythonRunnerSettings.getInstance().getState().outputFilePath;
+        return getSampleFolderPath() + "/output.txt";
     }
+
 }

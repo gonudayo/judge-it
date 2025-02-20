@@ -11,10 +11,11 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <applicationConfigurable
-                id="com.gonudayo.judgeit.settings.PythonRunnerConfigurable"
+                id="com.gonudayo.judgeit.settings"
                 displayName="Judge It"
                 groupId="tools"
                 instance="com.gonudayo.judgeit.settings.PythonRunnerConfigurable"/>
+        <applicationService serviceImplementation="com.gonudayo.judgeit.settings.PythonRunnerSettings"/>
     </extensions>
 
     <actions>

@@ -5,16 +5,16 @@ import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import com.intellij.openapi.components.Service;
 
 @State(
         name = "com.gonudayo.judgeit.settings.PythonRunnerSettings",
         storages = @Storage("PythonRunnerSettings.xml")
 )
+@Service(Service.Level.APP)
 public class PythonRunnerSettings implements PersistentStateComponent<PythonRunnerSettings.State> {
-
     public static class State {
-        public String inputFilePath = "C:/Users/SSAFY/Downloads/SWEA-samples/input.txt";
-        public String outputFilePath = "C:/Users/SSAFY/Downloads/SWEA-samples/output.txt";
+        public String folderPath = "C:/Users/SSAFY/Downloads/SWEA-samples/"; // 기본 폴더 경로
     }
 
     private State state = new State();
@@ -23,7 +23,10 @@ public class PythonRunnerSettings implements PersistentStateComponent<PythonRunn
     @Override
     public State getState() {
         if (state == null) {
-            state = new State();
+            state = new State(); // 기본값 유지
+        }
+        if (state.folderPath == null || state.folderPath.isEmpty()) {
+            state.folderPath = "C:/Users/SSAFY/Downloads/SWEA-samples/"; // 기본값 설정
         }
         return state;
     }
@@ -32,12 +35,12 @@ public class PythonRunnerSettings implements PersistentStateComponent<PythonRunn
     public void loadState(@NotNull State newState) {
         if (newState != null) {
             this.state = newState;
+            System.out.println("Loaded folderPath: " + newState.folderPath); // 디버깅용 출력
         }
     }
 
     public static PythonRunnerSettings getInstance() {
-        PythonRunnerSettings instance = com.intellij.openapi.application.ApplicationManager.getApplication()
+        return com.intellij.openapi.application.ApplicationManager.getApplication()
                 .getService(PythonRunnerSettings.class);
-        return instance != null ? instance : new PythonRunnerSettings();
     }
 }
