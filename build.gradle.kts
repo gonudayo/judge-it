@@ -11,39 +11,30 @@ repositories {
     mavenCentral()
 }
 
-// Configure Gradle IntelliJ Plugin
-// Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
-//intellij {
-//    version.set("2024.1.7")
-//    type.set("IC") // Target IDE Platform
-//
-//    plugins.set(listOf(/* Plugin Dependencies */))
-//}
 intellij {
-    version.set("2024.1.7")
-    type.set("PC") // PyCharm Community: "PC", PyCharm Professional: "PY"
-    plugins.set(listOf("PythonCore")) // Python 플러그인 추가
+    version.set("2020.3") // 최소 버전 지정
+    type.set("PY") // Ultimate + Community Edition 지원
+    sandboxDir.set("${System.getProperty("user.home")}/.PyCharmSandbox")
 }
+
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17)) // JDK 17 사용
+        languageVersion.set(JavaLanguageVersion.of(11))
     }
 }
 
-
 tasks {
-    // Set the JVM compatibility versions
     withType<JavaCompile> {
-        sourceCompatibility = "17"
-        targetCompatibility = "17"
+        sourceCompatibility = "11"
+        targetCompatibility = "11"
     }
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions.jvmTarget = "17"
+        kotlinOptions.jvmTarget = "11"
     }
 
     patchPluginXml {
-        sinceBuild.set("241")
-        untilBuild.set("243.*")
+        sinceBuild.set("203")   // PyCharm 2020.3 지원
+        untilBuild.set("243.*") // 최신 버전까지 호환
     }
 
     signPlugin {
