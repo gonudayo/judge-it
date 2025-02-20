@@ -14,7 +14,8 @@ import com.intellij.openapi.components.Service;
 @Service(Service.Level.APP)
 public class PythonRunnerSettings implements PersistentStateComponent<PythonRunnerSettings.State> {
     public static class State {
-        public String folderPath = "C:/Users/SSAFY/Downloads/SWEA-samples/"; // 기본 폴더 경로
+        private static final String USER_HOME = System.getProperty("user.home");
+        public String folderPath =  USER_HOME + "/Downloads/SWEA-samples/"; // 기본 폴더 경로
     }
 
     private State state = new State();
