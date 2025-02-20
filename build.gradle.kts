@@ -17,6 +17,12 @@ intellij {
     sandboxDir.set("${System.getProperty("user.home")}/.PyCharmSandbox")
 }
 
+//intellij {
+//    localPath.set("C:/Program Files/JetBrains/PyCharm Community Edition 2020.3.5") // 로컬 PyCharm 지정
+//    type.set("PC") // PyCharm Community Edition
+//    sandboxDir.set("${System.getProperty("user.home")}/.PyCharmSandbox") // 샌드박스 설정
+//}
+
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(11))

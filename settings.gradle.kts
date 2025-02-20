@@ -5,4 +5,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = "swea-sample-judge-plugin"
+rootProject.name = "judge-it"
