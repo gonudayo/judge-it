@@ -14,7 +14,7 @@ import com.intellij.openapi.components.Service;
 @Service(Service.Level.APP)
 public class PythonRunnerSettings implements PersistentStateComponent<PythonRunnerSettings.State> {
     public static class State {
-        private static final String USER_HOME = System.getProperty("user.home");
+        private static final String USER_HOME = System.getProperty("user.home").replace("\\", "/");
         public String folderPath =  USER_HOME + "/Downloads/SWEA-samples/"; // 기본 폴더 경로
     }
 
@@ -36,7 +36,7 @@ public class PythonRunnerSettings implements PersistentStateComponent<PythonRunn
     public void loadState(@NotNull State newState) {
         if (newState != null) {
             this.state = newState;
-            System.out.println("Loaded folderPath: " + newState.folderPath); // 디버깅용 출력
+//            System.out.println("Loaded folderPath: " + newState.folderPath); // 디버깅용 출력
         }
     }
 
