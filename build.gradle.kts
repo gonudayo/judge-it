@@ -5,23 +5,23 @@ plugins {
 }
 
 group = "com.gonudayo"
-version = "1.0-SNAPSHOT"
+version = "1.1-SNAPSHOT"
 
 repositories {
     mavenCentral()
 }
 
-//intellij {
-//    version.set("2020.3") // 최소 버전 지정
-//    type.set("PY") // Ultimate + Community Edition 지원
-//    sandboxDir.set("${System.getProperty("user.home")}/.PyCharmSandbox")
-//}
-
 intellij {
-    localPath.set("C:/Program Files/JetBrains/PyCharm Community Edition 2020.3.5") // 로컬 PyCharm 지정
-    type.set("PC") // PyCharm Community Edition
-    sandboxDir.set("${System.getProperty("user.home")}/.PyCharmSandbox") // 샌드박스 설정
+    version.set("2020.3") // 최소 버전 지정
+    type.set("PY") // Ultimate + Community Edition 지원
+    sandboxDir.set("${System.getProperty("user.home")}/.PyCharmSandbox")
 }
+
+//intellij {
+//    localPath.set("C:/Program Files/JetBrains/PyCharm Community Edition 2020.3.5") // 로컬 PyCharm 지정
+//    type.set("PC") // PyCharm Community Edition
+//    sandboxDir.set("${System.getProperty("user.home")}/.PyCharmSandbox") // 샌드박스 설정
+//}
 
 java {
     toolchain {
