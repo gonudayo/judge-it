@@ -12,11 +12,11 @@ public class PythonRunnerSettingsComponent {
 
     public PythonRunnerSettingsComponent() {
         panel = new JPanel(new FlowLayout(FlowLayout.LEFT)); // 한 줄 정렬
-        panel.add(new JLabel("File:"));
+        panel.add(new JLabel("Sample Folder:"));
 
         // TextFieldWithBrowseButton을 직접 사용하여 파일 탐색기 연결
         folderPathField = new TextFieldWithBrowseButton();
-        folderPathField.setPreferredSize(new Dimension(300, 25)); // 길이 조정
+        folderPathField.setPreferredSize(new Dimension(500, 25)); // 길이 조정
         folderPathField.addBrowseFolderListener(
                 "Select Folder", "", null,
                 FileChooserDescriptorFactory.createSingleFolderDescriptor()

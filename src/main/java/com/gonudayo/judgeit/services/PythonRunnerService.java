@@ -1,29 +1,40 @@
 package com.gonudayo.judgeit.services;
 
-import com.intellij.openapi.projectRoots.Sdk;
-import com.intellij.openapi.roots.ProjectRootManager;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.project.Project;
+import com.gonudayo.judgeit.settings.PythonRunnerSettings;
+import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.CapturingProcessHandler;
 import com.intellij.execution.process.ProcessOutput;
-import com.intellij.execution.ExecutionException;
-import com.gonudayo.judgeit.settings.PythonRunnerSettings;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.openapi.roots.ProjectRootManager;
+import com.intellij.openapi.vfs.VirtualFile;
 
+import javax.swing.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.io.*;
-import javax.swing.*;
-import java.awt.*;
 
 
 
 public class PythonRunnerService {
     public static void runPythonFile(Project project, VirtualFile file) {
+        FileDocumentManager.getInstance().saveAllDocuments();
         String pythonPath = getPythonExecutable(project);
         if (pythonPath == null) {
-            showResultDialog("Error", "Python SDK not found!");
+            showResultDialog("Error", "Python SDK not found!",false);
             return;
         }
 
@@ -40,7 +51,7 @@ public class PythonRunnerService {
             // 1. 원본 Python 코드 읽기
             String originalCode = new String(Files.readAllBytes(Paths.get(originalFilePath)), StandardCharsets.UTF_8);
 
-            // 2. `sys.stdin = open("C:/Users/SSAFY/Downloads/SWEA-samples/input.txt", "r")` 추가
+            // 2. `sys.stdin = open("input.txt", "r")` 추가
             String modifiedCode = "import sys\nsys.stdin = open(\"" + sampleInputFilePath + "\", \"r\")\n\n" + originalCode;
 
             // 3. 수정된 코드를 임시 파일에 저장
@@ -59,7 +70,7 @@ public class PythonRunnerService {
 
             // 실행 중 에러가 발생하면 stderr 표시
             if (!output.getStderr().isEmpty()) {
-                showResultDialog("Execution Error", output.getStderr());
+                showResultDialog("Execution Error", output.getStderr(), false);
                 return;  // 비교 진행 X
             }
 
@@ -67,7 +78,7 @@ public class PythonRunnerService {
             compareOutputs(project, file.getParent().getPath());
 
         } catch (ExecutionException | IOException e) {
-            showResultDialog("Execution Error", "Error: " + e.getMessage());
+            showResultDialog("Execution Error", "Error: " + e.getMessage(), false);
             e.printStackTrace();
         } finally {
             // 8. 실행이 끝난 후 임시 파일 삭제
@@ -80,13 +91,18 @@ public class PythonRunnerService {
         BufferedReader userOutput = new BufferedReader(new FileReader(parentPath + "/your_output.txt"));
         BufferedReader sampleOutput = new BufferedReader(new FileReader(getOutputFilePath()));
 
-        StringBuilder resultMessage = new StringBuilder();
+        StringBuilder compareResultMessage = new StringBuilder();
+        StringBuilder userOutputMessage = new StringBuilder();
         String userLine, sampleLine;
         int i = 1, success = 1;
 
         while (true) {
             userLine = userOutput.readLine();
             sampleLine = sampleOutput.readLine();
+
+            if (userLine != null) {
+                userOutputMessage.append(userLine).append("\n");
+            }
 
             if (userLine == null && sampleLine == null) break;
 
@@ -95,9 +111,9 @@ public class PythonRunnerService {
             sampleLine = cleanLine(sampleLine);
 
             if (!userLine.equals(sampleLine)) {
-                resultMessage.append("Line ").append(i).append(": Different!\n")
-                        .append("You    : ").append(userLine).append("\n")
-                        .append("Sample : ").append(sampleLine).append("\n");
+                compareResultMessage.append("Line ").append(i).append(" is different.\n")
+                        .append("You----->").append(userLine).append("\n")
+                        .append("Sample-->").append(sampleLine).append("\n");
                 success = 0;
             }
             i++;
@@ -108,17 +124,48 @@ public class PythonRunnerService {
 
         // 최종 결과 메시지 출력
         if (success == 1) {
-            showResultDialog("Comparison Result", "Success!");
+            showResultDialog("Judge Result", userOutputMessage.toString(), true);
         } else {
-            showResultDialog("Comparison Result", "Fail!\n\n" + resultMessage.toString());
+            showResultDialog("Judge Result", userOutputMessage.toString() +
+                    "DIFF\n" + "--------------------\n" + compareResultMessage.toString(), false);
         }
     }
 
+
     // 결과창
-    private static void showResultDialog(String title, String showMessage) {
-        JTextArea textArea = new JTextArea(showMessage, 50, 100); // 높이 50줄, 너비 100글자
-        textArea.setEditable(false); // 편집 불가 설정
-        JScrollPane scrollPane = new JScrollPane(textArea); // 스크롤 추가
+    public static void showResultDialog(String title, String showMessage, boolean isSuccess) {
+        // JTextPane 생성 (색상 적용 가능)
+        JTextPane textPane = new JTextPane();
+        textPane.setEditable(false);
+        textPane.setBackground(Color.BLACK);  // 배경 검정
+        textPane.setForeground(Color.WHITE);  // 기본 글자색 흰색
+        textPane.setFont(new Font("Monospaced", Font.PLAIN, 14));
+
+        // 스타일 적용을 위한 StyledDocument 사용
+        StyledDocument doc = textPane.getStyledDocument();
+
+        // 기본 스타일 (흰색)
+        SimpleAttributeSet defaultStyle = new SimpleAttributeSet();
+        StyleConstants.setForeground(defaultStyle, Color.WHITE);
+
+        // 결과 강조 스타일 (녹색/빨간색)
+        SimpleAttributeSet resultStyle = new SimpleAttributeSet();
+        StyleConstants.setForeground(resultStyle, isSuccess ? Color.GREEN : Color.RED);
+        StyleConstants.setBold(resultStyle, true); // 결과 부분만 볼드 처리
+
+        try {
+            // 첫 번째 줄 (결과 메시지 - 색상 적용)
+            doc.insertString(doc.getLength(), isSuccess ? "Success" : "Failure", resultStyle);
+            doc.insertString(doc.getLength(), "\n\n", defaultStyle);
+
+            // 나머지 메시지 (기본 흰색)
+            doc.insertString(doc.getLength(), showMessage, defaultStyle);
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+
+        // 스크롤 추가
+        JScrollPane scrollPane = new JScrollPane(textPane);
 
         // JDialog 생성
         JDialog dialog = new JDialog();
@@ -129,22 +176,65 @@ public class PythonRunnerService {
 
         // 닫기 버튼 생성
         JButton closeButton = new JButton("Close");
-        closeButton.addActionListener(e -> dialog.dispose()); // 버튼 클릭 시 창 닫기
+        closeButton.addActionListener(e -> dialog.dispose());
 
         // 엔터 키로 닫기 활성화
         dialog.getRootPane().setDefaultButton(closeButton);
+
+        // ESC 키로 창 닫기 기능 추가
+        KeyStroke escapeKey = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+        dialog.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(escapeKey, "CLOSE_DIALOG");
+        dialog.getRootPane().getActionMap().put("CLOSE_DIALOG", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dialog.dispose();
+            }
+        });
 
         // 버튼을 포함할 패널 생성
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(closeButton);
 
+        // 기본 다이얼로그 크기 설정
+        int maxWidth = 800, maxHeight = 800;  // 최대 크기
+        int minWidth = 300, minHeight = 150;  // 최소 크기
+
+        // 버튼 높이
+        int buttonPanelHeight = 50;
+
+        // 폰트 메트릭스로 한 줄 높이 계산
+        FontMetrics metrics = textPane.getFontMetrics(textPane.getFont());
+        int lineHeight = metrics.getHeight() + 3; // 한 줄 높이
+
+        int lineCount = showMessage.split("\n").length + 4; // 결과 + 메시지 줄 수
+
+        // 텍스트 길이에 따라 다이얼로그 크기 조절
+        int textWidth = Math.min(maxWidth, Math.max(minWidth, showMessage.length() * 7));
+        int textHeight = Math.min(maxHeight, Math.max(minHeight, lineCount * lineHeight));
+
+        // 다이얼로그 크기 설정
+        dialog.setSize(textWidth, textHeight + buttonPanelHeight);
+        dialog.setLocationRelativeTo(null); // 화면 중앙에 표시
+
         // 컴포넌트 추가
         dialog.add(scrollPane, BorderLayout.CENTER);
         dialog.add(buttonPanel, BorderLayout.SOUTH);
 
-        dialog.setSize(800, 800);  // 기본 크기 설정
-        dialog.setLocationRelativeTo(null); // 화면 중앙에 표시
-        dialog.setResizable(true); // 크기 조정 가능하게 설정
+        // 포커스 트래버설 정책을 설정하여 버튼이 기본 포커스가 되도록 강제
+        dialog.setFocusTraversalPolicy(new FocusTraversalPolicy() {
+            @Override
+            public Component getInitialComponent(Window window) {
+                return closeButton;  // 첫 포커스를 closeButton으로 강제
+            }
+
+            @Override public Component getComponentAfter(Container focusCycleRoot, Component aComponent) { return closeButton; }
+            @Override public Component getComponentBefore(Container focusCycleRoot, Component aComponent) { return closeButton; }
+            @Override public Component getDefaultComponent(Container focusCycleRoot) { return closeButton; }
+            @Override public Component getLastComponent(Container focusCycleRoot) { return closeButton; }
+            @Override public Component getFirstComponent(Container focusCycleRoot) { return closeButton; }
+        });
+
+        dialog.setResizable(true);
         dialog.setVisible(true);
     }
 
